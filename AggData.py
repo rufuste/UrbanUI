@@ -10,6 +10,26 @@ from pathlib import Path
 
 
 class AggData:
+    """
+    A class for aggregating sensor data over a specified time period.
+
+    Attributes:
+        instances (list): A list to store instances of AggData objects.
+        data_params (dict): Parameters for fetching data from the API.
+        df (DataFrame): DataFrame to store fetched data.
+        df_downsampled (DataFrame): DataFrame to store downsampled data.
+        downsampled (bool): Indicates if the data has been downsampled.
+        days (int): Number of days for data aggregation.
+        units (str): Units of the sensor data.
+
+    Methods:
+        __init__(self, variable, _days=1): Initializes the AggData object.
+        fetch_agg_data(self, data_params): Fetches aggregated data from the API.
+        downsample(self): Downsamples the data to a lower resolution.
+        get_target_frequency(self, days): Determines the target frequency for downsampling.
+        get_mean_average(self): Calculates the mean average of the sensor data.
+        __str__(self): Returns a string representation of the AggData object.
+    """
     instances = []
     data_params = {}
     df = pd.DataFrame()
@@ -20,6 +40,9 @@ class AggData:
 
     def __init__(self, variable, _days=1):
         self.days = _days
+        self.base_path = Path('data_files')  # Specify directory
+        self.base_path.mkdir(exist_ok=True)  # Create directory if it doesn't exist
+
 
         self.data_params = dict(
             data_variable=variable,
@@ -46,8 +69,8 @@ class AggData:
 
     def fetch_agg_data(self, data_params):
         # Set up filename with variable and number of days
-        csv_filename = f"{data_params['data_variable']}_{(datetime.now() - datetime.strptime(data_params['starttime'], '%Y%m%d%H%M%S')).days}_days.csv"
-        csv_path = Path(csv_filename)
+        csv_filename = f"{self.data_params['data_variable']}_{self.days}_days.csv"
+        csv_path = self.base_path / csv_filename
 
         try:
             # Attempt to fetch data from API
@@ -59,9 +82,11 @@ class AggData:
             else:
                 # Else set up dataframe and update csv
                 df = pd.read_csv(io.StringIO(r.text))
+                print("DataFrame loaded successfully:", df.head())
                 df.to_csv(csv_path, index=False)
                 return df
         except Exception as e:
+            print("Failed to load DataFrame:", e)
             # If site down for maintenance, attempt to load most recent csv
             if csv_path.exists():
                 print(f"Loading data from {csv_path} due to API error: {e}")
