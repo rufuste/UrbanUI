@@ -1,28 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import fetchData from '../services/dataService';
+import React from 'react';
+import useDataFetch from '../hooks/useDataFetch';
 
 const Dashboard = () => {
-    const [data, setData] = useState([]);
-    const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        setIsLoading(true);
-        setError(null);
-        fetchData('PM2.5')
-            .then(jsonData => setData(jsonData))
-            .catch(error => {
-                setError('Failed to fetch data: ' + error.message);
-                console.error('There was a problem with the fetch operation:', error);
-            })
-            .finally(() => setIsLoading(false));
-    }, []);
+    const { data, loading, error } = useDataFetch('/api/data/PM2.5', {});
 
     return (
         <div>
-            {isLoading && <p>Loading data...</p>}
+            {loading && <p>Loading data...</p>}
             {error && <p>Error: {error}</p>}
-            {!isLoading && data.map((item, index) => (
+            {!loading && data && data.map((item, index) => (
                 <div key={index}>
                     {item.value}
                 </div>

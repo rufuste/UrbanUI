@@ -1,6 +1,6 @@
 // hooks/useDataFetch.js
 import { useState, useEffect } from 'react';
-import fetchData from '../Services/fetchData';
+import fetchData from '../services/dataService';
 
 const useDataFetch = (url, params) => {
   const [data, setData] = useState(null);

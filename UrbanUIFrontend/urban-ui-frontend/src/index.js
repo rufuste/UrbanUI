@@ -14,9 +14,9 @@ const container = document.getElementById('root');
 const root = createRoot(container); // Using the new createRoot API
 
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
 );
 
 reportWebVitals(console.log);
