@@ -1,19 +1,46 @@
-import React from 'react';
-import useDataFetch from '../hooks/useDataFetch';
+import React, { useState } from 'react';
+import { Grid, Paper, Tabs, Tab, Box } from '@mui/material';
+import PollutantChart from './PollutantChart';
+import InteractiveMap from './InteractiveMap';
 
 const Dashboard = () => {
-    const { data, loading, error } = useDataFetch('/api/data/PM2.5', {});
+    const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
+
+    const handlePollutantChange = (event, newValue) => {
+        setSelectedPollutant(newValue);
+    };
 
     return (
-        <div>
-            {loading && <p>Loading data...</p>}
-            {error && <p>Error: {error}</p>}
-            {!loading && data && data.map((item, index) => (
-                <div key={index}>
-                    {item.value}
-                </div>
-            ))}
-        </div>
+        <Box sx={{ flexGrow: 1 }}>
+            <Tabs
+                value={selectedPollutant}
+                onChange={handlePollutantChange}
+                indicatorColor="primary"
+                textColor="primary"
+                centered
+            >
+                <Tab label="PM2.5" value="PM2.5" />
+                <Tab label="PM10" value="PM10" />
+                <Tab label="NO2" value="NO2" />
+            </Tabs>
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <Paper>
+                        <InteractiveMap pollutant={selectedPollutant} />
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <Paper>
+                        <PollutantChart type="line" pollutant={selectedPollutant} />
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <Paper>
+                        <PollutantChart type="bar" pollutant={selectedPollutant} />
+                    </Paper>
+                </Grid>
+            </Grid>
+        </Box>
     );
 };
 

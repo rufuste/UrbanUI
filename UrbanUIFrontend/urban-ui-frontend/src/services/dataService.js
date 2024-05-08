@@ -1,11 +1,19 @@
-// src/services/dataService.js
-const fetchData = async (endpoint) => {
-    const url = `${process.env.REACT_APP_BACKEND_URL}/api/data/${endpoint}`;
-    const response = await fetch(url);
+const fetchData = async (endpoint, params) => {
+    const url = `${process.env.REACT_APP_BACKEND_URL}${endpoint}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
     if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorText = await response.text();
+        throw new Error(`Network response was not ok: ${errorText}`);
     }
-    return await response.json();
+
+    const data = await response.json();
+    return data;
 };
 
 export default fetchData;

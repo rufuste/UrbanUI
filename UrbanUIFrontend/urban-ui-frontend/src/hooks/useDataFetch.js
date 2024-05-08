@@ -1,25 +1,27 @@
-// hooks/useDataFetch.js
 import { useState, useEffect } from 'react';
 import fetchData from '../services/dataService';
 
-const useDataFetch = (url, params) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const useDataFetch = (endpoint, params) => {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchData(url, params)
-      .then(data => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError(error);
-        setLoading(false);
-      });
-  }, [url, params]);
+    useEffect(() => {
+        const fetchDataAsync = async () => {
+            try {
+                const data = await fetchData(endpoint, params);
+                setData(data);
+            } catch (error) {
+                setError(error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  return { data, loading, error };
+        fetchDataAsync();
+    }, [endpoint, params]);
+
+    return { data, loading, error };
 };
 
 export default useDataFetch;
