@@ -1,7 +1,7 @@
 // PollutantChart.js
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
-import { LineChart, BarChart } from '@mui/x-charts';
+import { LineChart, ScatterPlot } from '@mui/x-charts';
 import useDataFetch from '../hooks/useDataFetch';
 
 const PollutantChart = ({ type, pollutant }) => {
@@ -17,8 +17,8 @@ const PollutantChart = ({ type, pollutant }) => {
         <div>
             {type === 'line' ? (
                 <LineChart
-                    xAxis={{ label: 'Time' }} 
-                    yAxis={{ label: 'Value' }} 
+                    xAxis={[{ data: chartData.map(d => d.x), label: 'Time' }]} 
+                    yAxis={[{ label: 'Value' }]} 
                     series={[{
                         data: chartData,
                         color: theme.palette.primary.main,
@@ -27,9 +27,9 @@ const PollutantChart = ({ type, pollutant }) => {
                     height={300}
                 />
             ) : (
-                <BarChart
-                    xAxis={{ label: 'Time' }} 
-                    yAxis={{ label: 'Value' }} 
+                <ScatterPlot
+                    xAxis={[{ data: chartData.map(d => d.x), label: 'Time' }]} 
+                    yAxis={[{ label: 'Value' }]} 
                     series={[{
                         data: chartData,
                         color: theme.palette.primary.main,

@@ -36,7 +36,7 @@ const Dashboard = () => {
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <Paper>
-                        <PollutantChart type="bar" pollutant={selectedPollutant} />
+                        <PollutantChart type="scatter" pollutant={selectedPollutant} />
                     </Paper>
                 </Grid>
             </Grid>

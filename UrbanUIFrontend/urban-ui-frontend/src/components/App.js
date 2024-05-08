@@ -1,6 +1,7 @@
 import React from 'react';
 import { CssBaseline, Container, AppBar, Toolbar, Typography } from '@mui/material';
 import Dashboard from './Dashboard';
+import ErrorBoundary from './ErrorBoundary';
 
 const App = () => {
     return (
@@ -14,7 +15,9 @@ const App = () => {
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg">
-                <Dashboard />
+                <ErrorBoundary>
+                    <Dashboard />
+                </ErrorBoundary>
             </Container>
         </div>
     );
