@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as d3 from 'd3';
 import L from 'leaflet';
@@ -22,9 +22,6 @@ const createSpikes = (data, map, scaleFactor) => {
         .data(data)
         .enter().append("path");
 
-    map.on("zoomend", reset);
-    reset();
-
     function reset() {
         const bounds = path.bounds({ type: "FeatureCollection", features: data });
         const topLeft = bounds[0];
@@ -42,6 +39,9 @@ const createSpikes = (data, map, scaleFactor) => {
             .attr("stroke-width", 2.5)
             .attr("fill", "none");
     }
+
+    map.on("zoomend", reset);
+    reset();
 };
 
 const InteractiveMap = ({ pollutant }) => {

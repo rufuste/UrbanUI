@@ -1,5 +1,6 @@
 const fetchData = async (endpoint, params) => {
     const url = `${process.env.REACT_APP_BACKEND_URL}${endpoint}`;
+    
     const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -13,7 +14,9 @@ const fetchData = async (endpoint, params) => {
     }
 
     const data = await response.json();
+    console.log(data)
     return data;
 };
 
 export default fetchData;
+

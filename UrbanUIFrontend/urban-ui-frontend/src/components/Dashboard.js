@@ -22,6 +22,10 @@ const Dashboard = () => {
                 <Tab label="PM2.5" value="PM2.5" />
                 <Tab label="PM10" value="PM10" />
                 <Tab label="NO2" value="NO2" />
+                <Tab label="O3" value="O3" />
+                <Tab label="Humidity" value="Humidity" />
+                <Tab label="Wind Speed" value="Wind Speed" />
+                <Tab label="CO" value="CO" />
             </Tabs>
             <Grid container spacing={3}>
                 <Grid item xs={12}>

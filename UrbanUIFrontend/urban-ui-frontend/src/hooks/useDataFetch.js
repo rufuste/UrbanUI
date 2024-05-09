@@ -20,7 +20,7 @@ const useDataFetch = (endpoint, params) => {
 
         fetchDataAsync();
     }, [endpoint, params]);
-
+    
     return { data, loading, error };
 };
 
