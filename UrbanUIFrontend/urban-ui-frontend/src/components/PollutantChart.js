@@ -23,19 +23,16 @@ const PollutantChart = ({ type, pollutant }) => {
         return <p>No data available to plot.</p>;
     }
 
-    const xAxisProps = [
-        {
-            dataKey: 'Timestamp',
-            valueFormatter: (value) => new Date(value).toLocaleString(),
-            min: chartData[0]?.Timestamp,
-            max: chartData[chartData.length - 1]?.Timestamp,
-            label: 'Time',
-            dataset: chartData
-        }
-    ];
-
     const lineChartProps = {
-        xAxis: xAxisProps,
+        xAxis: [
+            {
+                dataKey: 'Timestamp',
+                valueFormatter: (value) => new Date(value).toLocaleString(),
+                min: chartData[0]?.Timestamp,
+                max: chartData[chartData.length - 1]?.Timestamp,
+                label: 'Time'
+            }
+        ],
         series: [
             {
                 dataKey: 'Value',
@@ -50,10 +47,11 @@ const PollutantChart = ({ type, pollutant }) => {
     };
 
     const scatterChartProps = {
-        xAxis: xAxisProps,
+        width: 500,
+        height: 300,
         series: [
             {
-                label: 'Pollutant Data',
+                label: chartData[0]?.Variable || 'Value',
                 data: chartData.map(item => ({
                     x: item.Timestamp,
                     y: item.Value,
@@ -61,9 +59,15 @@ const PollutantChart = ({ type, pollutant }) => {
                 }))
             }
         ],
-        dataset: chartData,
-        width: 600,
-        height: 300
+        xAxis: [
+            {
+                valueFormatter: (value) => new Date(value).toLocaleString(),
+                min: chartData[0]?.Timestamp,
+                max: chartData[chartData.length - 1]?.Timestamp,
+                label: 'Time'
+            }
+        ],
+        dataset: chartData
     };
 
     return (

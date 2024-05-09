@@ -29,9 +29,9 @@ const Dashboard = () => {
             </Tabs>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <Paper>
+                    {/* <Paper>
                         <InteractiveMap pollutant={selectedPollutant} />
-                    </Paper>
+                    </Paper> */}
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <Paper>
