@@ -26,13 +26,13 @@ def plot_line_graph_tab(var1, var2, remove_outliers):
             var2.df_downsampled = Remove_Suspect(var2.df)
             print("Outliers Included")
 
-        # Downsample the data
+        # Down-sample the data
         if not var1.downsampled:
             var1.downsample()
         if not var2.downsampled:
             var2.downsample()
 
-        print("Downsampled")
+        print("Down-sampled")
         # Plot the line graphs
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
         plot_scatter_graph(var1.df_downsampled, var1, ax=ax1)
@@ -154,6 +154,21 @@ remove_outliers_checkbox = widgets.Checkbox(
 
 
 def fetch_agg(variable1, _days):
+    """
+        Fetches and returns the aggregated sensor data for the specified variable and time period.
+
+        This function searches for an existing instance of the AggData class that matches the specified
+        variable and number of days. If no matching instance is found, it creates a new AggData instance
+        with the specified parameters.
+
+        Parameters:
+        - variable1 (str): The data variable to fetch (e.g., pollutant type).
+        - _days (int): The number of days over which to aggregate the data.
+
+        Returns:
+        - AggData: An instance of the AggData class containing the aggregated data for the specified variable and time period.
+    """
+
     print(f"Fetching data for variable {variable1} and days {_days}")
 
     # Find the AggData instance with the selected data variables and days

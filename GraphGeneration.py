@@ -1,5 +1,6 @@
 import contextily as ctx
 import matplotlib.pyplot as plt
+import pandas as pd
 import plotly.graph_objects as go
 from ipywidgets import widgets
 import geopandas as gpd
