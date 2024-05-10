@@ -1,6 +1,9 @@
 const fetchData = async (endpoint, params) => {
-    const url = `${process.env.REACT_APP_BACKEND_URL}${endpoint}`;
+    const url = new URL(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`);
     
+    // Append params as query parameters
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
     const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -14,9 +17,8 @@ const fetchData = async (endpoint, params) => {
     }
 
     const data = await response.json();
-    console.log(data)
+    console.log(data);
     return data;
 };
 
 export default fetchData;
-
