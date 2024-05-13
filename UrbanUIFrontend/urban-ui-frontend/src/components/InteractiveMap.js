@@ -4,90 +4,86 @@ import 'leaflet/dist/leaflet.css';
 import * as d3 from 'd3';
 import * as d3Geo from 'd3-geo';
 import L from 'leaflet';
+import { useTheme } from '@mui/material/styles';
 import useDataFetch from '../hooks/useDataFetch';
-
-// TODO fix tooltips, add legend for scale, fix normalisation, add winsorization
 
 const D3Layer = ({ data }) => {
   const map = useMap();
+  const theme = useTheme();
 
   useEffect(() => {
     const svg = d3.select(map.getPanes().overlayPane).append("svg");
     const g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
     const transform = d3Geo.geoTransform({
-      point: projectPoint
+      point: projectPoint,
     });
     const path = d3Geo.geoPath().projection(transform);
 
     const scaleFactor = 100;
 
-    const createSpikes = data => {
-        return data.map(item => {
-          const coords = [item['Sensor Centroid Longitude'], item['Sensor Centroid Latitude']];
-          const value = item['Value'];
-          const length = Math.log1p(value) * scaleFactor; // Scale factor for the spikes
-          //const length = d3.scaleLinear([0, d3.max(data, d => d.value)], [0, 100]);
-          
-          return {
-            type: "Feature",
-            geometry: {
-              type: "LineString",
-              coordinates: [
-                coords,
-                [coords[0], coords[1] + length * 1e-5]
-              ]
-            },
-            properties: {
-              value,
-              sensorName: item['Sensor Name']
-            }
-          };
-        });
-      };
-  
-      const spikesData = createSpikes(data);
-  
-      // Set up a color scale
-      const colorScale = d3.scaleSequential(d3.interpolateInferno)
-        .domain([0, d3.max(data, d => d['Value'])]);
-  
+    const createSpikes = (data) => {
+      return data.map((item) => {
+        const coords = [item['Sensor Centroid Longitude'], item['Sensor Centroid Latitude']];
+        const value = item['Value'];
+        const length = Math.log1p(value) * scaleFactor;
+
+        return {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              coords,
+              [coords[0], coords[1] + length * 1e-5],
+            ],
+          },
+          properties: {
+            value,
+            sensorName: item['Sensor Name'],
+          },
+        };
+      });
+    };
+
+    const spikesData = createSpikes(data);
+
+    const colorScale = d3.scaleSequential(d3.interpolateInferno).domain([0, d3.max(data, (d) => d['Value'])]);
+
     const format = d3.format(",.0f");
     const d3_features = g.selectAll("g")
-        .data(spikesData)
-        .enter()
-        .append("path")
-        .attr("d", d => {
-            const start = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[0][1], d.geometry.coordinates[0][0]));
-            const end = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[1][1], d.geometry.coordinates[1][0]));
-            return `M${start.x},${start.y}L${end.x},${end.y}`;
-        })
-        .attr("stroke", d => colorScale(d.properties.value))
-        .attr("stroke-width", 2.5)
-        .attr("fill", "none")
-        .on("mouseover", function (event, d) {
-            const [longitude, latitude] = d.geometry.coordinates[0];
-            const value = d.properties.value;
-            const sensorName = d.properties.sensorName;
+      .data(spikesData)
+      .enter()
+      .append("path")
+      .attr("d", (d) => {
+        const start = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[0][1], d.geometry.coordinates[0][0]));
+        const end = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[1][1], d.geometry.coordinates[1][0]));
+        return `M${start.x},${start.y}L${end.x},${end.y}`;
+      })
+      .attr("stroke", (d) => colorScale(d.properties.value))
+      .attr("stroke-width", 2.5)
+      .attr("fill", "none")
+      .on("mouseover", function (event, d) {
+        const [longitude, latitude] = d.geometry.coordinates[0];
+        const value = d.properties.value;
+        const sensorName = d.properties.sensorName;
 
-            L.popup()
-            .setLatLng([latitude, longitude])
-            .setContent(`<b>Sensor:</b> ${sensorName}<br><b>Value:</b> ${value.toFixed(2)}`)
-            .openOn(map);
-        })
-        .on("mouseout", function () {
-            map.closePopup()
-        .append("title")
-        .text(d => `${d.sensorName},${format(d.value)}`);
-    });
-      
-      
+        L.popup()
+          .setLatLng([latitude, longitude])
+          .setContent(`<b>Sensor:</b> ${sensorName}<br><b>Value:</b> ${value.toFixed(2)}`)
+          .openOn(map);
+      })
+      .on("mouseout", function () {
+        map.closePopup();
+        d3.select(this).append("title").text((d) => `${d.sensorName},${format(d.value)}`);
+      });
+
     const reset = () => {
       const bounds = path.bounds({ type: "FeatureCollection", features: spikesData });
       const topLeft = bounds[0];
       const bottomRight = bounds[1];
 
-      svg.attr("width", bottomRight[0] - topLeft[0])
+      svg
+        .attr("width", bottomRight[0] - topLeft[0])
         .attr("height", bottomRight[1] - topLeft[1])
         .style("left", `${topLeft[0]}px`)
         .style("top", `${topLeft[1]}px`);
@@ -110,13 +106,12 @@ const D3Layer = ({ data }) => {
     return () => {
       svg.remove();
     };
-  }, [data, map]);
+  }, [data, map, theme]);
 
   return null;
 };
 
 const InteractiveMap = ({ pollutant }) => {
-  // Pass the remove_outliers parameter as part of params
   const { data, loading, error } = useDataFetch(`/api/data/${pollutant}`, { remove_outliers: false });
   const center = [54.97226, -1.61731];
 
@@ -124,15 +119,8 @@ const InteractiveMap = ({ pollutant }) => {
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <MapContainer
-      center={center}
-      zoom={13}
-      style={{ height: "500px", width: "100%" }} // Adjust height to fit within the dashboard
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
+    <MapContainer center={center} zoom={13} style={{ height: "500px", width: "100%" }}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
       <D3Layer data={data} />
     </MapContainer>
   );
