@@ -7,6 +7,8 @@ import L from 'leaflet';
 import { useTheme } from '@mui/material/styles';
 import useDataFetch from '../hooks/useDataFetch';
 
+// Fix spikes, add winsorization, add tooltips
+
 const D3Layer = ({ data }) => {
   const map = useMap();
   const theme = useTheme();
@@ -47,35 +49,46 @@ const D3Layer = ({ data }) => {
 
     const spikesData = createSpikes(data);
 
-    const colorScale = d3.scaleSequential(d3.interpolateInferno).domain([0, d3.max(data, (d) => d['Value'])]);
+    const colorScale = d3.scaleSequential(d3.interpolateOranges).domain([0, d3.max(data, (d) => d['Value'])]);
 
     const format = d3.format(",.0f");
     const d3_features = g.selectAll("g")
-      .data(spikesData)
-      .enter()
-      .append("path")
-      .attr("d", (d) => {
-        const start = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[0][1], d.geometry.coordinates[0][0]));
-        const end = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[1][1], d.geometry.coordinates[1][0]));
-        return `M${start.x},${start.y}L${end.x},${end.y}`;
-      })
-      .attr("stroke", (d) => colorScale(d.properties.value))
-      .attr("stroke-width", 2.5)
-      .attr("fill", "none")
-      .on("mouseover", function (event, d) {
-        const [longitude, latitude] = d.geometry.coordinates[0];
-        const value = d.properties.value;
-        const sensorName = d.properties.sensorName;
+    .data(spikesData)
+    .enter()
+    .append("path")
+    .attr("d", (d) => {
+      const start = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[0][1], d.geometry.coordinates[0][0]));
+      const end = map.latLngToLayerPoint(new L.LatLng(d.geometry.coordinates[1][1], d.geometry.coordinates[1][0]));
+      return `M${start.x},${start.y}L${end.x},${end.y}`;
+    })
+    .attr("stroke", (d) => colorScale(d.properties.value))
+    .attr("stroke-width", 2.5)
+    .attr("fill", "none")
+    .attr("pointer-events","visible")
+    .on("mouseover", function (event, d) {
+      console.log("Mouseover")
+      const [longitude, latitude] = d.geometry.coordinates[0];
+      const value = d.properties.value;
+      const sensorName = d.properties.sensorName;
 
-        L.popup()
-          .setLatLng([latitude, longitude])
-          .setContent(`<b>Sensor:</b> ${sensorName}<br><b>Value:</b> ${value.toFixed(2)}`)
-          .openOn(map);
-      })
-      .on("mouseout", function () {
-        map.closePopup();
-        d3.select(this).append("title").text((d) => `${d.sensorName},${format(d.value)}`);
-      });
+      const popup = L.popup()
+        .setLatLng([latitude, longitude])
+        .setContent(`<b>Sensor:</b> ${sensorName}<br><b>Value:</b> ${value.toFixed(2)}`);
+
+      // Open the popup with a slight delay to improve user experience
+      setTimeout(() => {
+        popup.openOn(map);
+      }, 100);
+
+      // Prevent event propagation to ensure Leaflet handles it correctly
+      event.stopPropagation();
+    })
+    .on("mouseout", function () {
+      // Close the popup on mouseout
+      map.closePopup();
+      d3.select(this).append("title").text((d) => `${d.properties.sensorName}, ${d.properties.value}`);
+    });
+
 
     const reset = () => {
       const bounds = path.bounds({ type: "FeatureCollection", features: spikesData });

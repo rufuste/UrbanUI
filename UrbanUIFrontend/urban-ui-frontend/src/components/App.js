@@ -3,47 +3,40 @@ import { CssBaseline, Container, AppBar, Toolbar, Typography, ThemeProvider, cre
 import Dashboard from './Dashboard';
 import ErrorBoundary from './ErrorBoundary';
 
-import {
-    blueberryTwilightPalette,
-    mangoFusionPalette,
-    cheerfulFiestaPalette,} from '@mui/x-charts/colorPalettes';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 const App = () => {
+    //const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+    const prefersDarkMode = true;
 
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-   
-    const theme = React.useMemo(
-        () =>
-        createTheme({
-            palette: {
-                blueberryTwilightPalette,
-                mode: prefersDarkMode ? 'dark' : 'light'
-            },
-            }),
-        [prefersDarkMode],
-        );
+    
+    const theme = createTheme({
+        palette: {
+          mode: prefersDarkMode ? 'dark' : 'light',
+        },
+      });
+
+
+    
 
     return (
-        <ThemeProvider theme={theme}>
-            <div>
-                <CssBaseline />
-                <AppBar position="static">
-                    <Toolbar>
-                        <Typography variant="h6">
-                            UrbanUI Dashboard
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-                <Container maxWidth="lg">
-                    <ErrorBoundary>
-                        <Dashboard />
-                    </ErrorBoundary>
-                </Container>
-            </div>
-        </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <div>
+          <CssBaseline />
+          <AppBar position="static">
+            <Toolbar>
+              <Typography variant="h6">UrbanUI Dashboard</Typography>
+            </Toolbar>
+          </AppBar>
+          <Container maxWidth="lg">
+            <ErrorBoundary>
+              <Dashboard />
+            </ErrorBoundary>
+          </Container>
+        </div>
+      </ThemeProvider>
     );
-};
-
-export default App;
+  };
+  
+  export default App;

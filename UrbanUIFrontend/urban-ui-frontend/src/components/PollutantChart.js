@@ -8,8 +8,7 @@ import D3ScatterChart from './D3ScatterChart';
 
 const PollutantChart = ({ type, pollutant }) => {
 
-    const regularTheme = useTheme();
-    const theme = regularTheme;
+    const theme = useTheme();
     
     const { data, loading, error } = useDataFetch(`/api/data/${pollutant}`, {});
 
@@ -47,6 +46,7 @@ const PollutantChart = ({ type, pollutant }) => {
         dataset: chartData,
         width: 500,
         height: 300,
+        
       };
 
     return (
