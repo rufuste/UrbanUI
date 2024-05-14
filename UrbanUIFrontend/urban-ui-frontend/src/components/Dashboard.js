@@ -1,54 +1,147 @@
-import React, { useState } from 'react';
-import { Grid, Paper, Tabs, Tab, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemText, Toolbar, IconButton } from '@mui/material';
+import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import PollutantChart from './PollutantChart';
-import InteractiveMap from './InteractiveMap';
+import SpikeMap from './SpikeMap';
+import BubbleMap from './BubbleMap';
+import TimescaleDropdown from './TimescaleDropdown';
 
-const Dashboard = () => {
-    const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
+const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
+  const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
+  const [timescale, setTimescale] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
-    const handlePollutantChange = (event, newValue) => {
-        setSelectedPollutant(newValue);
-    };
+  const handlePollutantChange = (event, newValue) => {
+    setSelectedPollutant(newValue);
+  };
 
-    return (
-        <Box sx={{ flexGrow: 1 }}>
-            <Tabs
-                value={selectedPollutant}
-                onChange={handlePollutantChange}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-            >
-                <Tab label="PM2.5" value="PM2.5" />
-                <Tab label="PM10" value="PM10" />
-                <Tab label="NO2" value="NO2" />
-                <Tab label="O3" value="O3" />
-                <Tab label="Humidity" value="Humidity" />
-                <Tab label="Wind Speed" value="Wind Speed" />
-                <Tab label="CO" value="CO" />
-            </Tabs>
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <Paper>
-                    <InteractiveMap 
-                        pollutant= {selectedPollutant} // Adjust the endpoint as needed
-                        params={{}} // Add any necessary params here
-                    />
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper>
-                        <PollutantChart type="line" pollutant={selectedPollutant} />
-                    </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper>
-                        <PollutantChart type="scatter" pollutant={selectedPollutant} />
-                    </Paper>
-                </Grid>
-            </Grid>
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+  };
+
+  useEffect(() => {
+    // Fetch data based on selected pollutant and timescale
+    // This can be done through a function call or direct fetching inside the component
+  }, [selectedPollutant, timescale]);
+
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <Drawer
+        variant="persistent"
+        open={isSidebarOpen}
+        sx={{
+          width: 240,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
+        }}
+      >
+        <Toolbar>
+          <IconButton onClick={handleSidebarToggle}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </Toolbar>
+        <Box sx={{ overflow: 'auto' }}>
+          <List>
+            <ListItem>
+              <TimescaleDropdown timescale={timescale} setTimescale={setTimescale} />
+            </ListItem>
+            <ListItem button onClick={() => handleCategoryChange('All')}>
+              <ListItemText primary="All" />
+            </ListItem>
+            <ListItem button onClick={() => handleCategoryChange('Charts')}>
+              <ListItemText primary="Charts" />
+            </ListItem>
+            <ListItem button onClick={() => handleCategoryChange('Maps')}>
+              <ListItemText primary="Maps" />
+            </ListItem>
+            <ListItem button onClick={() => handleCategoryChange('Distribution')}>
+              <ListItemText primary="Distribution Plots" />
+            </ListItem>
+          </List>
         </Box>
-    );
+      </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Toolbar />
+        <Tabs
+          value={selectedPollutant}
+          onChange={handlePollutantChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="scrollable"
+          scrollButtons="auto"
+          aria-label="scrollable auto tabs"
+        >
+          <Tab label="PM2.5" value="PM2.5" />
+          <Tab label="PM10" value="PM10" />
+          <Tab label="NO" value="NO" />
+          <Tab label="NO2" value="NO2" />
+          <Tab label="NOx" value="NOx" />
+          <Tab label="O3" value="O3" />
+          <Tab label="Humidity" value="Humidity" />
+          <Tab label="Wind Speed" value="Wind Speed" />
+          <Tab label="CO" value="CO" />
+          <Tab label="Pressure" value="Pressure" />
+          <Tab label="Solar Radiation" value="Solar Radiation" />
+          <Tab label="Temperature" value="Temperature" />
+        </Tabs>
+        <Grid container spacing={3}>
+          {(selectedCategory === 'All' || selectedCategory === 'Charts') && (
+            <>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {selectedPollutant} Line Chart
+                    </Typography>
+                    <PollutantChart type="line" pollutant={selectedPollutant} days={timescale} />
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {selectedPollutant} Scatter Chart
+                    </Typography>
+                    <PollutantChart type="scatter" pollutant={selectedPollutant} days={timescale} />
+                  </CardContent>
+                </Card>
+              </Grid>
+            </>
+          )}
+          {(selectedCategory === 'All' || selectedCategory === 'Maps') && (
+            <>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {selectedPollutant} Spike Map
+                    </Typography>
+                    <SpikeMap pollutant={selectedPollutant} days={timescale} />
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {selectedPollutant} Bubble Map
+                    </Typography>
+                    <BubbleMap pollutant={selectedPollutant} days={timescale} />
+                  </CardContent>
+                </Card>
+              </Grid>
+            </>
+          )}
+          {(selectedCategory === 'All' || selectedCategory === 'Distribution') && (
+            <>
+              {/* Add distribution plot components here */}
+            </>
+          )}
+        </Grid>
+      </Box>
+    </Box>
+  );
 };
 
 export default Dashboard;

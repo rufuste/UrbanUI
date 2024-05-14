@@ -6,11 +6,12 @@ import D3ScatterChart from './D3ScatterChart';
 
 
 
-const PollutantChart = ({ type, pollutant }) => {
+const PollutantChart = ({ type, pollutant, days }) => {
 
     const theme = useTheme();
-    
-    const { data, loading, error } = useDataFetch(`/api/data/${pollutant}`, {});
+    const { data, loading, error } = useDataFetch(`/api/data/${pollutant}?days=${days}`, { remove_outliers: true });
+
+  
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error.message}</p>;

@@ -1,16 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useTheme } from '@mui/material/styles';
-import {
-    blueberryTwilightPalette,
-    mangoFusionPalette,
-    cheerfulFiestaPalette,} from '@mui/x-charts/colorPalettes';
-import { blue } from '@mui/material/colors';
 
-const D3ScatterChart = ({ data, width, height}) => {
-    const theme = useTheme();
-    const isDarkMode = theme.palette.mode === 'dark';
-    const svgRef = useRef();
+const D3ScatterChart = ({ data, width, height }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+  const svgRef = useRef();
 
   useEffect(() => {
     const svg = d3
@@ -37,15 +32,11 @@ const D3ScatterChart = ({ data, width, height}) => {
       .nice()
       .range([innerHeight, 0]);
 
-    const colorGreyRed = ["#d7e1ee", "#cbd6e4", "#bfcbdb", "#b3bfd1", "#a4a2a8", "#df8879", "#c86558", "#b04238", "#991f17"]
-    const blueYellow = ["#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f", "#a6d75b", "#c9e52f", "#d0ee11", "#d0f400"]
-    const blackPink=["#2e2b28", "#3b3734", "#474440", "#54504c", "#6b506b", "#ab3da9", "#de25da", "#eb44e8", "#ff80ff"]
-
     const colorScale = d3.scaleSequential()
-  .domain([0, d3.max(data, d => d.Value)])
-  .interpolator(isDarkMode ? d3.interpolatePlasma : d3.interpolateYlOrBr);
+      .domain([0, d3.max(data, d => d.Value)])
+      .interpolator(isDarkMode ? d3.interpolatePlasma : d3.interpolateYlOrBr);
 
-    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
+    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%Y-%m-%d %H:%M'));
     const yAxis = d3.axisLeft(yScale);
 
     const g = svg.append('g')
