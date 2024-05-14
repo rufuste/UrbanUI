@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import D3BubbleLayer from './D3BubbleLayer';
 import useDataFetch from '../hooks/useDataFetch';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const BubbleMap = ({ pollutant, days }) => {
   const { data, loading, error } = useDataFetch(`/api/data/${pollutant}?days=${days}`, { remove_outliers: false });
   const center = [54.97226, -1.61731];
 
-  if (loading) return <p>Loading map...</p>;
+  if (loading) return <CircularProgress />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (

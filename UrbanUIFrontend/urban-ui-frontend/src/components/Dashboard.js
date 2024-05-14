@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemText, Toolbar, IconButton } from '@mui/material';
+import { Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemText, Toolbar, IconButton, Switch, FormControlLabel, CircularProgress } from '@mui/material';
 import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import PollutantChart from './PollutantChart';
 import SpikeMap from './SpikeMap';
 import BubbleMap from './BubbleMap';
+import ViolinPlot from './DistPlots'; // Import ViolinPlot
 import TimescaleDropdown from './TimescaleDropdown';
 
 const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
   const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
   const [timescale, setTimescale] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showOutliers, setShowOutliers] = useState(true); // Outliers toggle state
 
   const handlePollutantChange = (event, newValue) => {
     setSelectedPollutant(newValue);
@@ -135,7 +137,21 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
           )}
           {(selectedCategory === 'All' || selectedCategory === 'Distribution') && (
             <>
-              {/* Add distribution plot components here */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {selectedPollutant} Violin Plot
+                    </Typography>
+                    <FormControlLabel
+                      control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
+                      label="Show Outliers"
+                    />
+                    <ViolinPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale}/>
+                  </CardContent>
+                </Card>
+              </Grid>
+              {/* Add other distribution plots here */}
             </>
           )}
         </Grid>

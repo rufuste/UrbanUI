@@ -20,7 +20,7 @@ const D3BubbleLayer = ({ data }) => {
       return data.map((item) => {
         const coords = [item['Sensor Centroid Longitude'], item['Sensor Centroid Latitude']];
         const value = item['Value'];
-        const radius = Math.log1p(value) * 5; // Adjust the scale factor for better visualization
+        const radius = Math.log1p(value) * 5;
 
         return {
           type: "Feature",
