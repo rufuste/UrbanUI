@@ -29,7 +29,7 @@ def hello_world():
 @app.route("/api/data/<variable>", methods=['GET'])
 def get_data(variable):
     days = request.args.get('days', default=1, type=int)
-    remove_outliers = request.args.get('remove_outliers', default=True, type=bool)
+    remove_outliers = request.args.get('remove_outliers', default='true').lower() in ['true', '1', 'yes']
 
     try:
         data_instance = AggData(variable, days)

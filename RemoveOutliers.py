@@ -1,3 +1,5 @@
+import pandas as pd
+
 def Remove_Suspect(df):
     """
     Cleans a DataFrame by removing suspect or invalid data.
@@ -8,9 +10,11 @@ def Remove_Suspect(df):
     Returns:
     - DataFrame: A cleaned DataFrame with NaN values and suspect readings removed.
     """
+    if 'Value' not in df.columns or 'Flagged as Suspect Reading' not in df.columns:
+        raise ValueError("DataFrame must contain 'Value' and 'Flagged as Suspect Reading' columns")
 
     # Drop rows containing NaN values
-    df.dropna(inplace=True)
+    df = df.dropna()
 
     # Remove rows with 'Value' <= 0
     df = df[df['Value'] > 0]
@@ -19,7 +23,6 @@ def Remove_Suspect(df):
     df = df[df['Flagged as Suspect Reading'] == False]
 
     return df
-
 
 def Remove_Outlier_Indices(df):
     """
@@ -31,13 +34,14 @@ def Remove_Outlier_Indices(df):
     Returns:
     - DataFrame: A boolean DataFrame where True indicates non-outlier data points.
     """
+    if 'Value' not in df.columns:
+        raise ValueError("DataFrame must contain 'Value' column")
 
-    Q1 = df.quantile(0.25)
-    Q3 = df.quantile(0.75)
+    Q1 = df['Value'].quantile(0.25)
+    Q3 = df['Value'].quantile(0.75)
     IQR = Q3 - Q1
-    trueList = ~((df < (Q1 - 1.5 * IQR)) | (df > (Q3 + 1.5 * IQR)))
+    trueList = ~((df['Value'] < (Q1 - 1.5 * IQR)) | (df['Value'] > (Q3 + 1.5 * IQR)))
     return trueList
-
 
 def iqr_method(df):
     """
@@ -49,8 +53,7 @@ def iqr_method(df):
     Returns:
     - DataFrame: A DataFrame containing only the non-outlier entries from the original DataFrame.
     """
-
-    nonOutliers = Remove_Outlier_Indices(df['Value'])
+    nonOutliers = Remove_Outlier_Indices(df)
 
     # Non-Outlier Subset of the Given Dataset
     dfIQR = df[nonOutliers]
