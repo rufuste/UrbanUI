@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemText, Toolbar, IconButton, Switch, FormControlLabel, CircularProgress } from '@mui/material';
+import {
+  Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemText, Toolbar, IconButton, Switch, FormControlLabel, CircularProgress
+} from '@mui/material';
 import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import PollutantChart from './PollutantChart';
 import SpikeMap from './SpikeMap';
 import BubbleMap from './BubbleMap';
-import ViolinPlot from './DistPlots'; // Import ViolinPlot
+import ViolinPlot from './ViolinPlot'; // Import ViolinPlot
 import TimescaleDropdown from './TimescaleDropdown';
+import D3ScatterChart from './D3ScatterChart';
 
 const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
   const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
@@ -90,22 +93,22 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
           {(selectedCategory === 'All' || selectedCategory === 'Charts') && (
             <>
               <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
+                <Card sx={{ height: 400 }}>
+                  <CardContent sx={{ height: '100%' }}>
                     <Typography variant="h6" gutterBottom>
                       {selectedPollutant} Line Chart
                     </Typography>
-                    <PollutantChart type="line" pollutant={selectedPollutant} days={timescale} />
+                    <PollutantChart pollutant={selectedPollutant} days={timescale} />
                   </CardContent>
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
+                <Card sx={{ height: 400 }}>
+                  <CardContent sx={{ height: '100%' }}>
                     <Typography variant="h6" gutterBottom>
                       {selectedPollutant} Scatter Chart
                     </Typography>
-                    <PollutantChart type="scatter" pollutant={selectedPollutant} days={timescale} />
+                    <D3ScatterChart pollutant={selectedPollutant} days={timescale} />
                   </CardContent>
                 </Card>
               </Grid>
@@ -114,8 +117,8 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
           {(selectedCategory === 'All' || selectedCategory === 'Maps') && (
             <>
               <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
+                <Card sx={{ height: 400 }}>
+                  <CardContent sx={{ height: '100%' }}>
                     <Typography variant="h6" gutterBottom>
                       {selectedPollutant} Spike Map
                     </Typography>
@@ -124,8 +127,8 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
+                <Card sx={{ height: 400 }}>
+                  <CardContent sx={{ height: '100%' }}>
                     <Typography variant="h6" gutterBottom>
                       {selectedPollutant} Bubble Map
                     </Typography>
@@ -138,8 +141,8 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
           {(selectedCategory === 'All' || selectedCategory === 'Distribution') && (
             <>
               <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
+                <Card sx={{ height: 400 }}>
+                  <CardContent sx={{ height: '100%' }}>
                     <Typography variant="h6" gutterBottom>
                       {selectedPollutant} Violin Plot
                     </Typography>
@@ -147,7 +150,7 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
                       control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
                       label="Show Outliers"
                     />
-                    <ViolinPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale}/>
+                    <ViolinPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale} />
                   </CardContent>
                 </Card>
               </Grid>

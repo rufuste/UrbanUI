@@ -7,6 +7,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -40,11 +41,15 @@ const App = () => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <ErrorBoundary>
+      <Container maxWidth="xl">
+        <ErrorBoundary>
         <Dashboard isSidebarOpen={isSidebarOpen} handleSidebarToggle={handleSidebarToggle} />
-      </ErrorBoundary>
+        </ErrorBoundary>
+      </Container>
     </ThemeProvider>
   );
 };
 
 export default App;
+
+

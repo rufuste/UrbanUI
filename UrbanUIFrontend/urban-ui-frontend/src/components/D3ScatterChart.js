@@ -1,15 +1,22 @@
+
+// D3ScatterChart.js
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useTheme } from '@mui/material/styles';
+import useDataFetch from '../hooks/useDataFetch';
+import withAutoResize from './withAutoResize';
 
-const D3ScatterChart = ({ data, width, height }) => {
+const D3ScatterChart = ({ width, height, pollutant = "PM2.5", days = 1, remove_outliers = true }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   const svgRef = useRef();
 
+  const { data, loading, error } = useDataFetch(`/api/data/${pollutant}?days=${days}`, { remove_outliers });
+
   useEffect(() => {
-    const svg = d3
-      .select(svgRef.current)
+    if (loading || error || !data) return;
+
+    const svg = d3.select(svgRef.current)
       .attr('width', width)
       .attr('height', height)
       .style('background', theme.palette.background.paper)
@@ -24,19 +31,18 @@ const D3ScatterChart = ({ data, width, height }) => {
     svg.selectAll('*').remove();
 
     const xScale = d3.scaleTime()
-      .domain(d3.extent(data, d => d.Timestamp))
+      .domain(d3.extent(data, d => new Date(d.Timestamp)))
       .range([0, innerWidth]);
 
     const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.Value)])
-      .nice()
+      .domain([0, d3.max(data, d => d.Value)]).nice()
       .range([innerHeight, 0]);
 
     const colorScale = d3.scaleSequential()
       .domain([0, d3.max(data, d => d.Value)])
       .interpolator(isDarkMode ? d3.interpolatePlasma : d3.interpolateYlOrBr);
 
-    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat('%Y-%m-%d %H:%M'));
+    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
     const yAxis = d3.axisLeft(yScale);
 
     const g = svg.append('g')
@@ -77,13 +83,13 @@ const D3ScatterChart = ({ data, width, height }) => {
     g.selectAll('circle')
       .data(data)
       .enter().append('circle')
-      .attr('cx', d => xScale(d.Timestamp))
+      .attr('cx', d => xScale(new Date(d.Timestamp)))
       .attr('cy', d => yScale(d.Value))
       .attr('r', 4)
       .attr('fill', d => colorScale(d.Value))
       .attr('stroke', theme.palette.background.paper)
       .attr('stroke-width', 1)
-      .on('mouseover', function(event, d) {
+      .on('mouseover', function (event, d) {
         d3.select(this)
           .transition()
           .duration(200)
@@ -103,7 +109,7 @@ const D3ScatterChart = ({ data, width, height }) => {
           .style('left', `${event.pageX + 5}px`)
           .style('top', `${event.pageY - 28}px`);
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         d3.select(this)
           .transition()
           .duration(200)
@@ -111,9 +117,16 @@ const D3ScatterChart = ({ data, width, height }) => {
 
         d3.selectAll('.tooltip').remove();
       });
-  }, [data, width, height, theme]);
+  }, [data, loading, error, width, height, theme, isDarkMode]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  if (data.length === 0) {
+    return <p>No data available to plot.</p>;
+  }
 
   return <svg ref={svgRef}></svg>;
 };
 
-export default D3ScatterChart;
+export default withAutoResize(D3ScatterChart);

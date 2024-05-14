@@ -1,10 +1,12 @@
+// ViolinPlot.js
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useTheme } from '@mui/material/styles';
 import CircularProgress from '@mui/material/CircularProgress';
 import useDataFetch from '../hooks/useDataFetch';
+import withAutoResize from './withAutoResize';
 
-const ViolinPlot = ({ pollutant, width = 600, height = 300, showOutliers = true, days = 1 }) => {
+const ViolinPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) => {
   const svgRef = useRef();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -102,6 +104,11 @@ const ViolinPlot = ({ pollutant, width = 600, height = 300, showOutliers = true,
       .style('text-anchor', 'middle')
       .text('Value');
 
+    return () => {
+      // Properly clean up any D3 resources or event listeners here
+      svg.selectAll('*').remove();
+    };
+
   }, [data, width, height, loading, error, pollutant, showOutliers, theme]);
 
   if (loading) return <CircularProgress />;
@@ -111,4 +118,4 @@ const ViolinPlot = ({ pollutant, width = 600, height = 300, showOutliers = true,
   return <svg ref={svgRef}></svg>;
 };
 
-export default ViolinPlot;
+export default withAutoResize(ViolinPlot);

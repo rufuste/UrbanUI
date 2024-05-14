@@ -1,11 +1,12 @@
+// PollutantChart.js
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { LineChart } from '@mui/x-charts';
 import useDataFetch from '../hooks/useDataFetch';
-import D3ScatterChart from './D3ScatterChart';
 import CircularProgress from '@mui/material/CircularProgress';
+import withAutoResize from './withAutoResize';
 
-const PollutantChart = ({ type, pollutant, days }) => {
+const PollutantChart = ({ width, height, pollutant, days }) => {
   const theme = useTheme();
   const { data, loading, error } = useDataFetch(`/api/data/${pollutant}?days=${days}`, { remove_outliers: true });
 
@@ -13,9 +14,9 @@ const PollutantChart = ({ type, pollutant, days }) => {
   if (error) return <p>Error: {error.message}</p>;
 
   const chartData = data.map(item => ({
-    Timestamp: Date.parse(item.Timestamp), // Convert to numeric value (milliseconds since epoch)
+    Timestamp: Date.parse(item.Timestamp),
     Value: item.Value,
-    Variable: item.Variable
+    Variable: item.Variable,
   }));
 
   if (chartData.length === 0) {
@@ -41,21 +42,11 @@ const PollutantChart = ({ type, pollutant, days }) => {
       },
     ],
     dataset: chartData,
-    width: 500,
-    height: 300,
+    width: width || 500,
+    height: height || 300,
   };
 
-  return (
-    <div>
-      {type === 'line' ? (
-        <LineChart {...lineChartProps} />
-      ) : (
-        type === 'scatter' ? (
-          <D3ScatterChart data={chartData} width={500} height={300} />
-        ) : null
-      )}
-    </div>
-  );
+  return <LineChart {...lineChartProps} />;
 };
 
-export default PollutantChart;
+export default withAutoResize(PollutantChart);
