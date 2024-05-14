@@ -10,11 +10,9 @@ def Remove_Suspect(df):
     Returns:
     - DataFrame: A cleaned DataFrame with NaN values and suspect readings removed.
     """
-    if 'Value' not in df.columns or 'Flagged as Suspect Reading' not in df.columns:
-        raise ValueError("DataFrame must contain 'Value' and 'Flagged as Suspect Reading' columns")
 
     # Drop rows containing NaN values
-    df = df.dropna()
+    df.dropna(inplace=True)
 
     # Remove rows with 'Value' <= 0
     df = df[df['Value'] > 0]
@@ -23,6 +21,7 @@ def Remove_Suspect(df):
     df = df[df['Flagged as Suspect Reading'] == False]
 
     return df
+
 
 def Remove_Outlier_Indices(df):
     """
@@ -58,3 +57,5 @@ def iqr_method(df):
     # Non-Outlier Subset of the Given Dataset
     dfIQR = df[nonOutliers]
     return dfIQR
+
+
