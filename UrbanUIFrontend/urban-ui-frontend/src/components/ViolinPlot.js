@@ -1,4 +1,3 @@
-// ViolinPlot.js
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useTheme } from '@mui/material/styles';
@@ -54,9 +53,13 @@ const ViolinPlot = ({ pollutant, width, height, showOutliers = true, days = 1 })
       .domain(yScale.domain())
       .thresholds(yScale.ticks(24)); // Adjust the number of bins
 
-    const colorScale = d3.scaleSequential()
-      .domain([0, d3.max(processedData, d => d.values.length)])
-      .interpolator(isDarkMode ? d3.interpolatePlasma : d3.interpolateYlOrBr);
+    // Define color scales for light and dark mode
+    const lightColorPalette = d3.schemeSet2;
+    const darkColorPalette = d3.schemeSet1; // Adjust the palette if needed for dark mode
+
+    const colorScale = d3.scaleOrdinal()
+      .domain(processedData.map(d => d.category))
+      .range(isDarkMode ? darkColorPalette : lightColorPalette);
 
     const areaBuilder = d3.area()
       .x0(d => d.length > 0 ? -xScale.bandwidth() / 2 : 0)
@@ -80,7 +83,7 @@ const ViolinPlot = ({ pollutant, width, height, showOutliers = true, days = 1 })
         .datum(bins)
         .attr('d', areaBuilder)
         .attr('transform', `translate(${xScale(d.category) + xScale.bandwidth() / 2}, 0)`)
-        .style('fill', colorScale(maxBinCount))
+        .style('fill', colorScale(d.category))
         .style('stroke', 'black')
         .style('opacity', 0.7);
     });

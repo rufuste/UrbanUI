@@ -9,6 +9,7 @@ import BubbleMap from './BubbleMap';
 import ViolinPlot from './ViolinPlot'; // Import ViolinPlot
 import TimescaleDropdown from './TimescaleDropdown';
 import D3ScatterChart from './D3ScatterChart';
+import BoxPlot from './BoxPlot';
 
 const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
   const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
@@ -154,7 +155,20 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
                   </CardContent>
                 </Card>
               </Grid>
-              {/* Add other distribution plots here */}
+              <Grid item xs={12} md={6}>
+                <Card sx={{ height: 400 }}>
+                    <CardContent sx={{ height: '100%' }}>
+                    <Typography variant="h6" gutterBottom>
+                        {selectedPollutant} Box Plot
+                    </Typography>
+                    <FormControlLabel
+                        control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
+                        label="Show Outliers"
+                    />
+                    <BoxPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale} />
+                    </CardContent>
+                </Card>
+                </Grid>
             </>
           )}
         </Grid>

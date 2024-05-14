@@ -1,5 +1,3 @@
-
-// D3ScatterChart.js
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useTheme } from '@mui/material/styles';
@@ -40,7 +38,7 @@ const D3ScatterChart = ({ width, height, pollutant = "PM2.5", days = 1, remove_o
 
     const colorScale = d3.scaleSequential()
       .domain([0, d3.max(data, d => d.Value)])
-      .interpolator(isDarkMode ? d3.interpolatePlasma : d3.interpolateYlOrBr);
+      .interpolator(isDarkMode ? d3.interpolatePlasma : d3.interpolateRgb("purple", "orange"));
 
     const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%Y-%m-%d %H:%M"));
     const yAxis = d3.axisLeft(yScale);
