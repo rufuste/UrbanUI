@@ -10,10 +10,16 @@ const withAutoResize = (WrappedComponent) => {
       const resizeObserver = new ResizeObserver((entries) => {
         if (entries.length > 0) {
           const entry = entries[0];
-          setDimensions({
-            width: entry.contentRect.width,
-            height: entry.contentRect.height,
-          });
+          const newWidth = entry.contentRect.width;
+          const newHeight = entry.contentRect.height;
+
+          // Only update state if dimensions have actually changed
+          if (newWidth !== dimensions.width || newHeight !== dimensions.height) {
+            setDimensions({
+              width: newWidth,
+              height: newHeight,
+            });
+          }
         }
       });
 
@@ -26,10 +32,17 @@ const withAutoResize = (WrappedComponent) => {
           resizeObserver.unobserve(containerRef.current);
         }
       };
-    }, []);
+    }, [dimensions.width, dimensions.height]);
 
     return (
-      <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          //transition: 'width 0.5s, height 1s', // Add transition for smooth resizing
+        }}
+      >
         <WrappedComponent {...props} width={dimensions.width} height={dimensions.height} />
       </div>
     );

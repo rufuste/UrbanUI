@@ -3,7 +3,7 @@ import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 const TimescaleDropdown = ({ timescale, setTimescale }) => {
   return (
-    <FormControl fullWidth>
+    <FormControl size="small" sx={{ minWidth: 120, marginRight: 2 }}>
       <InputLabel id="timescale-select-label">Timescale</InputLabel>
       <Select
         labelId="timescale-select-label"

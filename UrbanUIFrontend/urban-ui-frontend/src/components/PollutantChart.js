@@ -49,4 +49,4 @@ const PollutantChart = ({ width, height, pollutant, days }) => {
   return <LineChart {...lineChartProps} />;
 };
 
-export default withAutoResize(PollutantChart);
+export default PollutantChart;

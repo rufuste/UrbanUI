@@ -1,34 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemText, Toolbar, IconButton, Switch, FormControlLabel, CircularProgress
+  Grid, Paper, Tabs, Tab, Box, Card, CardContent, Typography, Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, IconButton, Switch, FormControlLabel, CircularProgress, Link, Checkbox, FormGroup
 } from '@mui/material';
 import { ChevronLeft as ChevronLeftIcon } from '@mui/icons-material';
 import PollutantChart from './PollutantChart';
 import SpikeMap from './SpikeMap';
 import BubbleMap from './BubbleMap';
-import ViolinPlot from './ViolinPlot'; // Import ViolinPlot
+import ViolinPlot from './ViolinPlot';
+import Stack from '@mui/material/Stack';
 import TimescaleDropdown from './TimescaleDropdown';
 import D3ScatterChart from './D3ScatterChart';
 import BoxPlot from './BoxPlot';
+import ForecastChart from './ForecastChart';
+import GaugeComponent from './Gauge'; // Import the Gauge component
 
 const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
   const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
   const [timescale, setTimescale] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [showOutliers, setShowOutliers] = useState(true); // Outliers toggle state
-
+  const [showOutliers, setShowOutliers] = useState(true);
+  const [isComparisonMode, setIsComparisonMode] = useState(false);
+  const [selectedPollutants, setSelectedPollutants] = useState(['PM2.5']);
+  const [pollutantAverages, setPollutantAverages] = useState({ 'PM2.5': 50, 'NO2': 20, 'PM10': 40 });
+  
   const handlePollutantChange = (event, newValue) => {
     setSelectedPollutant(newValue);
   };
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
+    if (category === 'Comparison') {
+      setIsComparisonMode(true);
+    } else {
+      setIsComparisonMode(false);
+    }
   };
 
-  useEffect(() => {
-    // Fetch data based on selected pollutant and timescale
-    // This can be done through a function call or direct fetching inside the component
-  }, [selectedPollutant, timescale]);
+  const handlePollutantSelection = (event, pollutant) => {
+    if (event.target.checked) {
+      setSelectedPollutants((prev) => [...prev, pollutant]);
+    } else {
+      setSelectedPollutants((prev) => prev.filter((item) => item !== pollutant));
+    }
+  };
+
+  // useEffect(() => {
+  //   // Fetch data based on selected pollutant and timescale
+  // }, [selectedPollutant, timescale]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -48,20 +66,29 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
         </Toolbar>
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            <ListItem>
-              <TimescaleDropdown timescale={timescale} setTimescale={setTimescale} />
-            </ListItem>
-            <ListItem button onClick={() => handleCategoryChange('All')}>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('All')}>
               <ListItemText primary="All" />
             </ListItem>
-            <ListItem button onClick={() => handleCategoryChange('Charts')}>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Charts')}>
               <ListItemText primary="Charts" />
             </ListItem>
-            <ListItem button onClick={() => handleCategoryChange('Maps')}>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Maps')}>
               <ListItemText primary="Maps" />
             </ListItem>
-            <ListItem button onClick={() => handleCategoryChange('Distribution')}>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Distribution')}>
               <ListItemText primary="Distribution Plots" />
+            </ListItem>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Forecast')}>
+              <ListItemText primary="Forecast" />
+            </ListItem>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Comparison')}>
+              <ListItemText primary="Comparison" />
+            </ListItem>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Information')}>
+              <ListItemText primary="Information" />
+            </ListItem>
+            <ListItem ListItemButton onClick={() => handleCategoryChange('Support')}>
+              <ListItemText primary="Support" />
             </ListItem>
           </List>
         </Box>
@@ -90,88 +117,310 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
           <Tab label="Solar Radiation" value="Solar Radiation" />
           <Tab label="Temperature" value="Temperature" />
         </Tabs>
+        {isComparisonMode && (
+          <FormGroup row>
+            {['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'O3', 'Humidity', 'Wind Speed', 'CO', 'Pressure', 'Solar Radiation', 'Temperature'].map((pollutant) => (
+              <FormControlLabel
+                key={pollutant}
+                control={
+                  <Checkbox
+                    checked={selectedPollutants.includes(pollutant)}
+                    onChange={(e) => handlePollutantSelection(e, pollutant)}
+                    name={pollutant}
+                  />
+                }
+                label={pollutant}
+              />
+            ))}
+          </FormGroup>
+        )}
+          <Box sx={{
+            position: 'fixed',
+            right: 0,
+            top: 64,
+            width: 200,
+            height: 'calc(100vh - 64px)',
+            overflowY: 'auto',
+            display: { xs: 'none', md: 'block' },
+            backgroundColor: 'background.paper',
+            padding: 2,
+            boxShadow: 3,
+          }}>
+            {['PM2.5', 'NO2', 'PM10'].map((pollutant) => (
+              <Box key={pollutant} sx={{ marginBottom: 3 }}>
+                <GaugeComponent pollutant={pollutant} value={pollutantAverages[pollutant]} />
+              </Box>
+            ))}
+          </Box>
+          
         <Grid container spacing={3}>
-          {(selectedCategory === 'All' || selectedCategory === 'Charts') && (
+          {isComparisonMode ? (
             <>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: 400 }}>
-                  <CardContent sx={{ height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
-                      {selectedPollutant} Line Chart
-                    </Typography>
-                    <PollutantChart pollutant={selectedPollutant} days={timescale} />
-                  </CardContent>
-                </Card>
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Line Charts
+                </Typography>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: 400 }}>
-                  <CardContent sx={{ height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
-                      {selectedPollutant} Scatter Chart
-                    </Typography>
-                    <D3ScatterChart pollutant={selectedPollutant} days={timescale} />
-                  </CardContent>
-                </Card>
+              {selectedPollutants.map((pollutant) => (
+                <Grid item xs={12} md={6} key={`line-${pollutant}`}>
+                  <Card sx={{ height: 400 }}>
+                    <CardContent sx={{ height: '80%' }}>
+                      <Typography variant="h6" gutterBottom>
+                        {pollutant} Line Chart
+                      </Typography>
+                      <PollutantChart pollutant={pollutant} days={timescale} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Scatter Charts
+                </Typography>
               </Grid>
-            </>
-          )}
-          {(selectedCategory === 'All' || selectedCategory === 'Maps') && (
-            <>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: 400 }}>
-                  <CardContent sx={{ height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
-                      {selectedPollutant} Spike Map
-                    </Typography>
-                    <SpikeMap pollutant={selectedPollutant} days={timescale} />
-                  </CardContent>
-                </Card>
+              {selectedPollutants.map((pollutant) => (
+                <Grid item xs={12} md={6} key={`scatter-${pollutant}`}>
+                  <Card sx={{ height: 400 }}>
+                    <CardContent sx={{ height: '80%' }}>
+                      <Typography variant="h6" gutterBottom>
+                        {pollutant} Scatter Chart
+                      </Typography>
+                      <D3ScatterChart pollutant={pollutant} days={timescale} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Violin Plots
+                </Typography>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: 400 }}>
-                  <CardContent sx={{ height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
-                      {selectedPollutant} Bubble Map
-                    </Typography>
-                    <BubbleMap pollutant={selectedPollutant} days={timescale} />
-                  </CardContent>
-                </Card>
-              </Grid>
-            </>
-          )}
-          {(selectedCategory === 'All' || selectedCategory === 'Distribution') && (
-            <>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: 400 }}>
-                  <CardContent sx={{ height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
-                      {selectedPollutant} Violin Plot
-                    </Typography>
-                    <FormControlLabel
-                      control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
-                      label="Show Outliers"
-                    />
-                    <ViolinPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale} />
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: 400 }}>
-                    <CardContent sx={{ height: '100%' }}>
-                    <Typography variant="h6" gutterBottom>
-                        {selectedPollutant} Box Plot
-                    </Typography>
-                    <FormControlLabel
+              {selectedPollutants.map((pollutant) => (
+                <Grid item xs={12} md={6} key={`violin-${pollutant}`}>
+                  <Card sx={{ height: 500 }}>
+                    <CardContent sx={{ height: '80%' }}>
+                      <Typography variant="h6" gutterBottom>
+                        {pollutant} Violin Plot
+                      </Typography>
+                      <FormControlLabel
                         control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
                         label="Show Outliers"
-                    />
-                    <BoxPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale} />
+                      />
+                      <ViolinPlot pollutant={pollutant} showOutliers={showOutliers} days={timescale} />
                     </CardContent>
-                </Card>
+                  </Card>
                 </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Box Plots
+                </Typography>
+              </Grid>
+              {selectedPollutants.map((pollutant) => (
+                <Grid item xs={12} md={6} key={`box-${pollutant}`}>
+                  <Card sx={{ height: 500 }}>
+                    <CardContent sx={{ height: '80%' }}>
+                      <Typography variant="h6" gutterBottom>
+                        {pollutant} Box Plot
+                      </Typography>
+                      <FormControlLabel
+                        control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
+                        label="Show Outliers"
+                      />
+                      <BoxPlot pollutant={pollutant} showOutliers={showOutliers} days={timescale} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Spike Maps
+                </Typography>
+              </Grid>
+              {selectedPollutants.map((pollutant) => (
+                <Grid item xs={12} md={6} key={`spike-${pollutant}`}>
+                  <Card sx={{ height: '100%' }}>
+                    <CardContent sx={{ height: '80%' }}>
+                      <Typography variant="h6" gutterBottom>
+                        {pollutant} Spike Map
+                      </Typography>
+                      <SpikeMap pollutant={pollutant} days={timescale} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Bubble Maps
+                </Typography>
+              </Grid>
+              {selectedPollutants.map((pollutant) => (
+                <Grid item xs={12} md={6} key={`bubble-${pollutant}`}>
+                  <Card sx={{ height: '100%' }}>
+                    <CardContent sx={{ height: '80%' }}>
+                      <Typography variant="h6" gutterBottom>
+                        {pollutant} Bubble Map
+                      </Typography>
+                      <BubbleMap pollutant={pollutant} days={timescale} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </>
+          ) : (
+            <>
+              {(selectedCategory === 'All' || selectedCategory === 'Charts') && (
+                <>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{ height: 400 }}>
+                      <CardContent sx={{ height: '80%' }}>
+                        <Typography variant="h6" gutterBottom>
+                          {selectedPollutant} Line Chart
+                        </Typography>
+                        <PollutantChart pollutant={selectedPollutant} days={timescale} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{ height: 400 }}>
+                      <CardContent sx={{ height: '80%' }}>
+                        <Typography variant="h6" gutterBottom>
+                          {selectedPollutant} Scatter Chart
+                        </Typography>
+                        <D3ScatterChart pollutant={selectedPollutant} days={timescale} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </>
+              )}
+              {(selectedCategory === 'All' || selectedCategory === 'Distribution') && (
+                <>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{ height: 500 }}>
+                      <CardContent sx={{ height: '80%' }}>
+                        <Typography variant="h6" gutterBottom>
+                          {selectedPollutant} Violin Plot
+                        </Typography>
+                        <FormControlLabel
+                          control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
+                          label="Show Outliers"
+                        />
+                        <ViolinPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{ height: 500 }}>
+                      <CardContent sx={{ height: '80%' }}>
+                        <Typography variant="h6" gutterBottom>
+                          {selectedPollutant} Box Plot
+                        </Typography>
+                        <FormControlLabel
+                          control={<Switch checked={showOutliers} onChange={() => setShowOutliers(!showOutliers)} />}
+                          label="Show Outliers"
+                        />
+                        <BoxPlot pollutant={selectedPollutant} showOutliers={showOutliers} days={timescale} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </>
+              )}
+              {(selectedCategory === 'All' || selectedCategory === 'Maps') && (
+                <>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{ height: '100%' }}>
+                      <CardContent sx={{ height: '80%' }}>
+                        <Typography variant="h6" gutterBottom>
+                          {selectedPollutant} Spike Map
+                        </Typography>
+                        <SpikeMap pollutant={selectedPollutant} days={timescale} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Card sx={{ height: '100%' }}>
+                      <CardContent sx={{ height: '80%' }}>
+                        <Typography variant="h6" gutterBottom>
+                          {selectedPollutant} Bubble Map
+                        </Typography>
+                        <BubbleMap pollutant={selectedPollutant} days={timescale} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </>
+              )}
+              {selectedCategory === 'Forecast' && (
+                <Grid item xs={12}>
+                  <ForecastChart pollutant={selectedPollutant} days={timescale} />
+                </Grid>
+              )}
+              {selectedCategory === 'Information' && (
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Information and Resources
+                      </Typography>
+                      <List>
+                        <ListItem>
+                          <Link href="https://www.epa.gov/outdoor-air-quality-data/air-data-basic-information" target="_blank" rel="noopener">
+                            Air Quality and Pollution Data - EPA
+                          </Link>
+                        </ListItem>
+                        <ListItem>
+                          <Link href="https://www.who.int/health-topics/air-pollution" target="_blank" rel="noopener">
+                            Air Pollution - WHO
+                          </Link>
+                        </ListItem>
+                        <ListItem>
+                          <Link href="https://en.wikipedia.org/wiki/Air_pollution" target="_blank" rel="noopener">
+                            Air Pollution - Wikipedia
+                          </Link>
+                        </ListItem>
+                        <ListItem>
+                          <Link href="https://www.atlassian.com/data/charts/violin-plot-complete-guide" target="_blank" rel="noopener">
+                            Violin Plots - Atlassian
+                          </Link>
+                        </ListItem>
+
+                        <ListItem>
+                          <Link href="https://statisticsbyjim.com/graphs/scatterplots/" target="_blank" rel="noopener">
+                            Scatter Plots
+                          </Link>
+                        </ListItem>
+                        
+                        <ListItem>
+                          <Link href="https://www.tableau.com/learn/articles/data-visualization" target="_blank" rel="noopener">
+                            Data Visualisation - Tableau
+                          </Link>
+                        </ListItem>
+                        {/* Add more links as needed */}
+                      </List>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )}
+              {selectedCategory === 'Support' && (
+                <Grid item xs={12}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        Support
+                      </Typography>
+                      <Typography variant="body1" gutterBottom>
+                        For feedback, assistance or any questions, please contact our support team.
+                      </Typography>
+                      <Typography variant="body1">
+                        Email: <Link href="mailto:support@fakeemail.com">support@fakeemail.com</Link>
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )}
             </>
           )}
         </Grid>
+        
       </Box>
     </Box>
   );

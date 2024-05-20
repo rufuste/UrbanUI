@@ -30,7 +30,6 @@ const ViolinPlot = ({ pollutant, width, height, showOutliers = true, days = 1 })
     const svg = d3.select(svgRef.current)
       .attr('width', width)
       .attr('height', height)
-      .style('background', theme.palette.background.paper)
       .style('margin-top', '10px')
       .style('border-radius', '8px')
       .style('box-shadow', theme.shadows[1]);

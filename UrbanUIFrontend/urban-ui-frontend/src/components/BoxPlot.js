@@ -5,7 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import useDataFetch from '../hooks/useDataFetch';
 import withAutoResize from './withAutoResize';
 
-const BoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) => {
+const HorizontalBoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) => {
   const svgRef = useRef();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -31,72 +31,71 @@ const BoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) =>
     const svg = d3.select(svgRef.current)
       .attr('width', width)
       .attr('height', height)
-      .style('background', theme.palette.background.paper)
       .style('margin-top', '10px')
       .style('border-radius', '8px')
-      .style('box-shadow', theme.shadows[1]);
+      .style('box-shadow', theme.shadows[1])
 
     svg.selectAll('*').remove(); // Clear previous content
 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const yScale = d3.scaleLinear()
+    const xScale = d3.scaleLinear()
       .domain([d3.min([min, d3.min(values)]), d3.max([max, d3.max(values)])])
-      .range([innerHeight, 0]);
+      .range([0, innerWidth]);
 
-    const xScale = d3.scaleBand()
+    const yScale = d3.scaleBand()
       .domain([pollutant])
-      .range([0, innerWidth])
-      .padding(0.2);
+      .range([0, innerHeight])
+      .padding(0.4);
 
     const color = isDarkMode ? '#90caf9' : '#1e88e5';
 
     // Draw whiskers
     g.append('line')
-      .attr('x1', xScale(pollutant) + xScale.bandwidth() / 2)
-      .attr('x2', xScale(pollutant) + xScale.bandwidth() / 2)
-      .attr('y1', yScale(min))
-      .attr('y2', yScale(q1))
-      .attr('stroke', 'black');
+      .attr('x1', xScale(min))
+      .attr('x2', xScale(q1))
+      .attr('y1', yScale(pollutant) + yScale.bandwidth() / 2)
+      .attr('y2', yScale(pollutant) + yScale.bandwidth() / 2)
+      .attr('stroke', theme.palette.primary.main);
 
     g.append('line')
-      .attr('x1', xScale(pollutant) + xScale.bandwidth() / 2)
-      .attr('x2', xScale(pollutant) + xScale.bandwidth() / 2)
-      .attr('y1', yScale(max))
-      .attr('y2', yScale(q3))
-      .attr('stroke', 'black');
+      .attr('x1', xScale(max))
+      .attr('x2', xScale(q3))
+      .attr('y1', yScale(pollutant) + yScale.bandwidth() / 2)
+      .attr('y2', yScale(pollutant) + yScale.bandwidth() / 2)
+      .attr('stroke', theme.palette.primary.main);
 
     g.append('line')
-      .attr('x1', xScale(pollutant) + xScale.bandwidth() / 2 - 5)
-      .attr('x2', xScale(pollutant) + xScale.bandwidth() / 2 + 5)
-      .attr('y1', yScale(min))
-      .attr('y2', yScale(min))
-      .attr('stroke', 'black');
+      .attr('x1', xScale(min))
+      .attr('x2', xScale(min))
+      .attr('y1', yScale(pollutant) + yScale.bandwidth() / 2 - 5)
+      .attr('y2', yScale(pollutant) + yScale.bandwidth() / 2 + 5)
+      .attr('stroke', theme.palette.primary.main);
 
     g.append('line')
-      .attr('x1', xScale(pollutant) + xScale.bandwidth() / 2 - 5)
-      .attr('x2', xScale(pollutant) + xScale.bandwidth() / 2 + 5)
-      .attr('y1', yScale(max))
-      .attr('y2', yScale(max))
-      .attr('stroke', 'black');
+      .attr('x1', xScale(max))
+      .attr('x2', xScale(max))
+      .attr('y1', yScale(pollutant) + yScale.bandwidth() / 2 - 5)
+      .attr('y2', yScale(pollutant) + yScale.bandwidth() / 2 + 5)
+      .attr('stroke', theme.palette.primary.main);
 
     // Draw box
     g.append('rect')
-      .attr('x', xScale(pollutant))
-      .attr('y', yScale(q3))
-      .attr('height', yScale(q1) - yScale(q3))
-      .attr('width', xScale.bandwidth())
+      .attr('x', xScale(q1))
+      .attr('y', yScale(pollutant))
+      .attr('width', xScale(q3) - xScale(q1))
+      .attr('height', yScale.bandwidth())
       .attr('fill', color)
       .attr('opacity', 0.7)
       .attr('stroke', 'black');
 
     // Draw median
     g.append('line')
-      .attr('x1', xScale(pollutant))
-      .attr('x2', xScale(pollutant) + xScale.bandwidth())
-      .attr('y1', yScale(median))
-      .attr('y2', yScale(median))
+      .attr('x1', xScale(median))
+      .attr('x2', xScale(median))
+      .attr('y1', yScale(pollutant))
+      .attr('y2', yScale(pollutant) + yScale.bandwidth())
       .attr('stroke', 'black');
 
     // Draw outliers
@@ -106,8 +105,8 @@ const BoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) =>
         .enter()
         .append('circle')
         .attr('class', 'outlier')
-        .attr('cx', xScale(pollutant) + xScale.bandwidth() / 2)
-        .attr('cy', d => yScale(d))
+        .attr('cx', d => xScale(d))
+        .attr('cy', yScale(pollutant) + yScale.bandwidth() / 2)
         .attr('r', 3)
         .attr('fill', 'red')
         .attr('stroke', 'black');
@@ -122,7 +121,7 @@ const BoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) =>
       .attr('y', margin.bottom - 10)
       .attr('fill', theme.palette.text.primary)
       .style('text-anchor', 'middle')
-      .text('Pollutant');
+      .text('Value');
 
     // Draw y-axis
     g.append('g')
@@ -132,15 +131,16 @@ const BoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) =>
       .attr('y', -10)
       .attr('fill', theme.palette.text.primary)
       .style('text-anchor', 'middle')
-      .text('Value');
+      .text('Pollutant');
 
     // Add plot title
     svg.append('text')
-      .attr('x', (width / 2))             
+      .attr('x', (width / 2))
       .attr('y', margin.top / 2)
-      .attr('text-anchor', 'middle')  
-      .style('font-size', '16px') 
-      .style('text-decoration', 'underline')  
+      .attr('text-anchor', 'middle')
+      .attr('fill', theme.palette.text.primary)
+      .style('font-size', '16px')
+      .style('text-decoration', 'underline')
       .text(`Distribution of ${pollutant} over the last ${days} days`);
 
     return () => {
@@ -156,4 +156,4 @@ const BoxPlot = ({ pollutant, width, height, showOutliers = true, days = 1 }) =>
   return <svg ref={svgRef}></svg>;
 };
 
-export default withAutoResize(BoxPlot);
+export default withAutoResize(HorizontalBoxPlot);

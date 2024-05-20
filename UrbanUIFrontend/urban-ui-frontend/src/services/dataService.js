@@ -1,4 +1,4 @@
-const fetchData = async (endpoint, params) => {
+const fetchData = async (endpoint, params, signal) => {
     const url = new URL(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`);
     
     // Append params as query parameters
@@ -9,15 +9,15 @@ const fetchData = async (endpoint, params) => {
         headers: {
             'Content-Type': 'application/json',
         },
+        signal,
     });
 
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Network response was not ok: ${errorText}`);
+        throw new Error(`Network response was not ok (status: ${response.status}): ${errorText}`);
     }
 
     const data = await response.json();
-    console.log(data);
     return data;
 };
 
