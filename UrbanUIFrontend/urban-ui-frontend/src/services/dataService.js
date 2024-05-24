@@ -1,7 +1,6 @@
 const fetchData = async (endpoint, params, signal) => {
     const url = new URL(`${process.env.REACT_APP_BACKEND_URL}${endpoint}`);
     
-    // Append params as query parameters
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
     const response = await fetch(url, {

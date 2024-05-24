@@ -14,9 +14,8 @@ import BoxPlot from './BoxPlot';
 import ForecastChart from './ForecastChart';
 import GaugeComponent from './Gauge'; // Import the Gauge component
 
-const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
+const Dashboard = ({ isSidebarOpen, handleSidebarToggle, timescale }) => {
   const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');
-  const [timescale, setTimescale] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showOutliers, setShowOutliers] = useState(true);
   const [isComparisonMode, setIsComparisonMode] = useState(false);
@@ -44,9 +43,6 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
     }
   };
 
-  // useEffect(() => {
-  //   // Fetch data based on selected pollutant and timescale
-  // }, [selectedPollutant, timescale]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -117,6 +113,7 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
           <Tab label="Solar Radiation" value="Solar Radiation" />
           <Tab label="Temperature" value="Temperature" />
         </Tabs>
+        {/* <TimescaleDropdown timescale={timescale} setTimescale={setTimescale} /> */}
         {isComparisonMode && (
           <FormGroup row>
             {['PM2.5', 'PM10', 'NO', 'NO2', 'NOx', 'O3', 'Humidity', 'Wind Speed', 'CO', 'Pressure', 'Solar Radiation', 'Temperature'].map((pollutant) => (
@@ -394,7 +391,6 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
                             Data Visualisation - Tableau
                           </Link>
                         </ListItem>
-                        {/* Add more links as needed */}
                       </List>
                     </CardContent>
                   </Card>
@@ -411,7 +407,7 @@ const Dashboard = ({ isSidebarOpen, handleSidebarToggle }) => {
                         For feedback, assistance or any questions, please contact our support team.
                       </Typography>
                       <Typography variant="body1">
-                        Email: <Link href="mailto:support@fakeemail.com">support@fakeemail.com</Link>
+                        Email: <Link href="mailto:support@nclurbanui.com">support@nclurbanui.com</Link>
                       </Typography>
                     </CardContent>
                   </Card>

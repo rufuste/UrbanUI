@@ -10,7 +10,7 @@ const TimescaleDropdown = ({ timescale, setTimescale }) => {
         id="timescale-select"
         value={timescale}
         label="Timescale"
-        onChange={(e) => setTimescale(e.target.value)}
+        onChange={(e) => setTimescale(parseInt(e.target.value, 10))}
       >
         <MenuItem value={1}>1 Day</MenuItem>
         <MenuItem value={3}>3 Days</MenuItem>

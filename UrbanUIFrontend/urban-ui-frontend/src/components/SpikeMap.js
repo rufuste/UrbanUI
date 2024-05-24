@@ -19,7 +19,7 @@ const SpikeMap = ({ pollutant, days }) => {
         attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
       />
       <D3SpikeLayer data={data} />
-    </MapContainer>
+    </MapContainer> 
   );
 };
 

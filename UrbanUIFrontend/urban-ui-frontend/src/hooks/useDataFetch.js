@@ -77,7 +77,7 @@ const useDataFetch = (endpoint, params = {}, refreshInterval = CACHE_DURATION) =
                 abortControllerRef.current.abort();
             }
         };
-    }, [endpoint, params, refreshInterval]);
+    }, [endpoint, params, refreshInterval]); // Include `params` and `refreshInterval` in the dependency array
 
     return { data, loading, error };
 };

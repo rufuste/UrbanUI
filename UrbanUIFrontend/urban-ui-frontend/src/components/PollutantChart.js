@@ -1,4 +1,3 @@
-// PollutantChart.js
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { LineChart } from '@mui/x-charts';
@@ -8,7 +7,7 @@ import withAutoResize from './withAutoResize';
 
 const PollutantChart = ({ width, height, pollutant, days }) => {
   const theme = useTheme();
-  const { data, loading, error } = useDataFetch(`/api/data/${pollutant}?days=${days}`, { remove_outliers: true });
+  const { data, loading, error } = useDataFetch(`/api/data/${pollutant}`, { days, remove_outliers: true });
 
   if (loading) return <CircularProgress />;
   if (error) return <p>Error: {error.message}</p>;
