@@ -3,12 +3,38 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.17",
+    "@mui/material": "^5.15.17",
+    "@mui/x-charts": "^7.5.0",
+    "@sgratzl/chartjs-chart-boxplot": "^4.3.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "@turf/turf": "^6.5.0",
+    "chart.js": "^4.4.2",
+    "chartjs": "^0.3.24",
+    "chartjs-chart-box-and-violin-plot": "^4.0.0",
+    "crypto-browserify": "^3.12.0",
+    "d3": "^7.9.0",
+    "d3-scale": "^4.0.2",
+    "d3-transition": "^3.0.1",
+    "leaflet": "^1.9.4",
+    "lodash": "^4.17.21",
+    "mathjs": "^12.4.2",
+    "os": "^0.1.2",
+    "os-browserify": "^0.3.0",
+    "path-browser": "^2.2.1",
+    "path-browserify": "^1.0.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-gauge-chart": "^0.5.1",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.23.0",
     "react-scripts": "^5.0.1",
+    "resize-observer-polyfill": "^1.5.1",
+    "topojson-client": "^3.1.0",
+    "turf": "^3.0.14",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -23,6 +49,10 @@
       "react-app/jest"
     ]
   },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -34,5 +64,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-app-rewired": "^2.2.1"
   }
 }
