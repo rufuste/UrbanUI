@@ -12,7 +12,7 @@ import TimescaleDropdown from './TimescaleDropdown';
 import D3ScatterChart from './D3ScatterChart';
 import BoxPlot from './BoxPlot';
 import ForecastChart from './ForecastChart';
-import GaugeComponent from './Gauge'; // Import the Gauge component
+import GaugeComponent from './Gauge';
 
 const Dashboard = ({ isSidebarOpen, handleSidebarToggle, timescale }) => {
   const [selectedPollutant, setSelectedPollutant] = useState('PM2.5');

@@ -15,7 +15,6 @@ const ViolinPlot = ({ pollutant, width, height, showOutliers = true, days = 1 })
   useEffect(() => {
     if (loading || error || !data) return;
 
-    // Preprocess the data to fit the expected format for the violin plot
     const processedData = [
       {
         category: pollutant,
@@ -50,11 +49,11 @@ const ViolinPlot = ({ pollutant, width, height, showOutliers = true, days = 1 })
 
     const binBuilder = d3.bin()
       .domain(yScale.domain())
-      .thresholds(yScale.ticks(24)); // Adjust the number of bins
+      .thresholds(yScale.ticks(24)); // Adjust number of bins
 
     // Define color scales for light and dark mode
     const lightColorPalette = d3.schemeSet2;
-    const darkColorPalette = d3.schemeSet1; // Adjust the palette if needed for dark mode
+    const darkColorPalette = d3.schemeSet1; // Adjust palette for dark mode
 
     const colorScale = d3.scaleOrdinal()
       .domain(processedData.map(d => d.category))

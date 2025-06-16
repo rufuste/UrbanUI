@@ -61,7 +61,7 @@ const useDataFetch = (endpoint, params = {}, refreshInterval = CACHE_DURATION) =
                     setError(err);
                 } finally {
                     setLoading(false);
-                    delete fetchQueue[cacheKey]; // Clean up the fetch queue
+                    delete fetchQueue[cacheKey]; // Clean up fetch queue
                 }
             }
         };
@@ -77,7 +77,7 @@ const useDataFetch = (endpoint, params = {}, refreshInterval = CACHE_DURATION) =
                 abortControllerRef.current.abort();
             }
         };
-    }, [endpoint, params, refreshInterval]); // Include `params` and `refreshInterval` in the dependency array
+    }, [endpoint, params, refreshInterval]); // Include params and refreshInterval in the dependency array
 
     return { data, loading, error };
 };

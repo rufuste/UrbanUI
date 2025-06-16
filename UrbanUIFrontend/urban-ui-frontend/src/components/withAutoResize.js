@@ -40,7 +40,7 @@ const withAutoResize = (WrappedComponent) => {
         style={{
           width: '100%',
           height: '100%',
-          //transition: 'width 0.5s, height 1s', // Add transition for smooth resizing
+          //transition: 'width 0.5s, height 1s', // transition for smooth resizing
         }}
       >
         <WrappedComponent {...props} width={dimensions.width} height={dimensions.height} />
