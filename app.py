@@ -40,7 +40,7 @@ def get_data(variable):
         if remove_outliers:
             data_instance.df = iqr_method(data_instance.df)
 
-        # Down-sample the data
+        # Down-sample the data, downsampling is performed upon the aggdata df downsampled attribute
         data_instance.df_downsampled = data_instance.df
         data_instance.downsample()
 
@@ -53,7 +53,7 @@ def get_data(variable):
 
 @app.route("/api/forecast/<variable>", methods=['GET'])
 def get_forecast(variable):
-    days = request.args.get('days', default=1, type=int)
+    days = request.args.get('days', default=30, type=int)
     try:
         data_instance = AggData(variable, days)
         forecast, mae = prophet_forecast(data_instance)

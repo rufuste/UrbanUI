@@ -64,8 +64,10 @@ class AggData:
             print("Units column is empty. Setting self.units to an empty string.")
             self.units = ""
 
-        self.df_downsampled = self.df
-        AggData.instances.append(self)
+
+        # Downsampled preloaded with copy of the df
+        # self.df_downsampled = self.df
+        # AggData.instances.append(self)
 
     def fetch_agg_data(self, data_params):
         # Set up filename with variable and number of days
