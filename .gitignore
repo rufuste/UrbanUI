@@ -1,5 +1,30 @@
-# Ignore PyCharm config folders
-.idea/
 
-# Ignore cache or data folders
-UrbanAPIServer/data_files/
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environments
+venv/
+.env/
+env/
+.venv/
+
+# IDE config folders
+.idea/
+.vscode/
+
+# Cache and data files
+data_files/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Bytecode
+*.pyc
