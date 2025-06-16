@@ -1,0 +1,5 @@
+# Ignore PyCharm config folders
+.idea/
+
+# Ignore cache or data folders
+UrbanAPIServer/data_files/
